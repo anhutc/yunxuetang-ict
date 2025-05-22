@@ -11,7 +11,7 @@ if (soBaiHoc > 0) {
   }
   if (idHoc[1] != undefined) {
     document.getElementsByClassName('linozj')[idHoc[1]].click()
-    var checkTime = setInterval(fcChecktime, 5000)
+    var checkTime = setInterval(fcChecktime, 30000)
     function fcChecktime(){
       tiepTuc = document.getElementsByClassName('yxtf-button--larger')[0]
       xacDinh = document.getElementsByClassName('yxtf-button--large')[0]
