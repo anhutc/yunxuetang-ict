@@ -2508,3 +2508,36 @@ function initialize() {
 
 // Bắt đầu ứng dụng
 initialize();
+
+// Loader function to inject and run the script
+function loadVideoProgressMenu(scriptUrl) {
+    return new Promise((resolve, reject) => {
+        // Clean up any existing instance
+        const existingMenu = document.getElementById('video-stats-menu');
+        const existingStyle = document.getElementById('video-progress-styles');
+        const existingOverlay = document.getElementById('video-stats-overlay');
+        const existingNotifications = document.getElementById('notifications-container');
+        
+        existingMenu?.remove();
+        existingStyle?.remove();
+        existingOverlay?.remove();
+        existingNotifications?.remove();
+
+        // Load and execute the script
+        fetch(scriptUrl)
+            .then(response => response.text())
+            .then(code => {
+                try {
+                    // Execute the code
+                    (new Function(code))();
+                    resolve('Video Progress Menu loaded successfully!');
+                } catch (error) {
+                    reject(`Error executing script: ${error.message}`);
+                }
+            })
+            .catch(error => reject(`Error loading script: ${error.message}`));
+    });
+}
+
+// Quick loader command to copy-paste into console
+// loadVideoProgressMenu('YOUR_SCRIPT_URL_HERE').then(console.log).catch(console.error);
