@@ -166,14 +166,6 @@ const CONSTANTS = {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: Segoe UI, Arial, sans-serif;
         `
-    },
-    TIMING: {
-        NOTIFICATION_DISPLAY: 3000,    // How long notifications stay visible
-        NOTIFICATION_FADE: 300,        // Fade animation duration
-        CLICK_DELAY: 500,             // Delay before actions after click
-        VIDEO_RESET_DELAY: 10000,     // Delay before resetting video time
-        OBSERVER_RECONNECT: 2000,     // Delay before reconnecting observers
-        ANIMATION_FRAME_THROTTLE: 16   // ~60fps throttle for animations
     }
 };
 
@@ -1835,18 +1827,44 @@ const UI = {
 
     // Add this at the top of the UI object
     showMessage(message, type = 'info') {
-        // Cache DOM queries and create elements only if needed
-        let notificationsContainer = document.getElementById('notifications-container');
-        const notificationTimers = new WeakMap();
-        
-        const clearNotificationTimers = (notification) => {
-            const timers = notificationTimers.get(notification);
-            if (timers) {
-                timers.forEach(clearTimeout);
-                notificationTimers.delete(notification);
+        // Predefined styles for different message types
+        const styles = {
+            success: {
+                background: 'linear-gradient(135deg, rgba(0,230,118,0.98), rgba(0,200,83,0.98))',
+                borderColor: 'rgba(0,230,118,0.3)',
+                boxShadow: '0 8px 32px rgba(0,230,118,0.25)'
+            },
+            error: {
+                background: 'linear-gradient(135deg, rgba(244,67,54,0.98), rgba(229,57,53,0.98))',
+                borderColor: 'rgba(244,67,54,0.3)',
+                boxShadow: '0 8px 32px rgba(244,67,54,0.25)'
+            },
+            warning: {
+                background: 'linear-gradient(135deg, rgba(255,193,7,0.98), rgba(255,152,0,0.98))',
+                borderColor: 'rgba(255,193,7,0.3)',
+                boxShadow: '0 8px 32px rgba(255,193,7,0.25)'
+            },
+            info: {
+                background: 'linear-gradient(135deg, rgba(33,150,243,0.98), rgba(3,169,244,0.98))',
+                borderColor: 'rgba(33,150,243,0.3)',
+                boxShadow: '0 8px 32px rgba(33,150,243,0.25)'
+            },
+            purple: {
+                background: 'linear-gradient(135deg, rgba(156,39,176,0.98), rgba(123,31,162,0.98))',
+                borderColor: 'rgba(156,39,176,0.3)',
+                boxShadow: '0 8px 32px rgba(156,39,176,0.25)'
+            },
+            cyan: {
+                background: 'linear-gradient(135deg, rgba(0,188,212,0.98), rgba(0,172,193,0.98))',
+                borderColor: 'rgba(0,188,212,0.3)',
+                boxShadow: '0 8px 32px rgba(0,188,212,0.25)'
             }
         };
 
+        const style = styles[type] || styles.info;
+
+        // Get or create notifications container
+        let notificationsContainer = document.getElementById('notifications-container');
         if (!notificationsContainer) {
             notificationsContainer = this.createElement('div', `
                 position: fixed;
@@ -1864,10 +1882,6 @@ const UI = {
                 min-width: 280px;
                 max-width: min(420px, calc(100vw - 40px));
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                will-change: transform;
-                transform: translateZ(0);
-                backface-visibility: hidden;
-                -webkit-backface-visibility: hidden;
 
                 /* Custom scrollbar for notifications container */
                 &::-webkit-scrollbar {
@@ -1888,37 +1902,7 @@ const UI = {
             document.body.appendChild(notificationsContainer);
         }
 
-        // Predefined styles with performance optimizations
-        const styles = {
-            success: {
-                background: 'linear-gradient(135deg, rgba(0,230,118,0.98), rgba(0,200,83,0.98))',
-                borderColor: 'rgba(0,230,118,0.3)',
-                boxShadow: '0 8px 32px rgba(0,230,118,0.25)',
-                transform: 'translateZ(0)'
-            },
-            error: {
-                background: 'linear-gradient(135deg, rgba(244,67,54,0.98), rgba(229,57,53,0.98))',
-                borderColor: 'rgba(244,67,54,0.3)',
-                boxShadow: '0 8px 32px rgba(244,67,54,0.25)',
-                transform: 'translateZ(0)'
-            },
-            warning: {
-                background: 'linear-gradient(135deg, rgba(255,193,7,0.98), rgba(255,152,0,0.98))',
-                borderColor: 'rgba(255,193,7,0.3)',
-                boxShadow: '0 8px 32px rgba(255,193,7,0.25)',
-                transform: 'translateZ(0)'
-            },
-            info: {
-                background: 'linear-gradient(135deg, rgba(33,150,243,0.98), rgba(3,169,244,0.98))',
-                borderColor: 'rgba(33,150,243,0.3)',
-                boxShadow: '0 8px 32px rgba(33,150,243,0.25)',
-                transform: 'translateZ(0)'
-            }
-        };
-
-        const style = styles[type] || styles.info;
-
-        // Create notification with optimized styles
+        // Create notification element
         const notification = this.createElement('div', `
             pointer-events: auto;
             padding: 16px 24px;
@@ -1929,7 +1913,7 @@ const UI = {
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            transform: translateX(120%) translateZ(0);
+            transform: translateX(120%);
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
@@ -1942,11 +1926,10 @@ const UI = {
             word-wrap: break-word;
             word-break: break-word;
             hyphens: auto;
-            will-change: transform, opacity;
             ${Object.entries(style).map(([key, value]) => `${key}: ${value};`).join('')}
 
             &:hover {
-                transform: translateX(0) scale(1.02) translateZ(0);
+                transform: translateX(0) scale(1.02);
                 box-shadow: ${style.boxShadow.replace('0.25)', '0.35)')}
             }
         `);
@@ -1982,7 +1965,6 @@ const UI = {
             border-radius: 50%;
             transition: all 0.2s ease;
             margin-top: -2px;
-            will-change: background-color, color;
 
             &:hover {
                 background: rgba(255,255,255,0.1);
@@ -1993,34 +1975,27 @@ const UI = {
         notification.append(messageText, closeButton);
         notificationsContainer.appendChild(notification);
 
-        // Optimized animation handling
-        let animationFrame;
-        const animate = () => {
-            cancelAnimationFrame(animationFrame);
-            animationFrame = requestAnimationFrame(() => {
-                notification.style.transform = 'translateX(0) translateZ(0)';
-                notification.style.opacity = '1';
-            });
-        };
+        // Animate in
+        requestAnimationFrame(() => {
+            notification.style.transform = 'translateX(0)';
+            notification.style.opacity = '1';
+        });
 
-        // Setup removal
+        // Setup auto-remove
+        let timeout;
         const remove = () => {
-            clearNotificationTimers(notification);
-            cancelAnimationFrame(animationFrame);
-            
-            notification.style.transform = 'translateX(120%) translateZ(0)';
+            clearTimeout(timeout);
+            notification.style.transform = 'translateX(120%)';
             notification.style.opacity = '0';
-            
-            setTimeout(() => {
-                notification.remove();
-                // Remove container if empty
-                if (notificationsContainer.children.length === 0) {
-                    notificationsContainer.remove();
-                }
-            }, CONSTANTS.TIMING.NOTIFICATION_FADE);
+            setTimeout(() => notification.remove(), 300);
+
+            // Remove container if empty
+            if (notificationsContainer.children.length <= 1) {
+                setTimeout(() => notificationsContainer.remove(), 300);
+            }
         };
 
-        // Add click handlers with cleanup
+        // Add click handlers
         closeButton.onclick = (e) => {
             e.stopPropagation();
             remove();
@@ -2028,22 +2003,14 @@ const UI = {
 
         notification.onclick = remove;
 
-        // Setup timers with cleanup
-        const timer = setTimeout(remove, CONSTANTS.TIMING.NOTIFICATION_DISPLAY);
-        notificationTimers.set(notification, [timer]);
+        // Auto remove after 3 seconds
+        timeout = setTimeout(remove, 3000);
 
-        // Handle hover
-        notification.addEventListener('mouseenter', () => {
-            clearNotificationTimers(notification);
-        });
-
+        // Pause timer on hover
+        notification.addEventListener('mouseenter', () => clearTimeout(timeout));
         notification.addEventListener('mouseleave', () => {
-            const newTimer = setTimeout(remove, CONSTANTS.TIMING.NOTIFICATION_DISPLAY);
-            notificationTimers.set(notification, [newTimer]);
+            timeout = setTimeout(remove, 3000);
         });
-
-        // Start animation
-        animate();
 
         return notification;
     }
@@ -2508,7 +2475,6 @@ function initialize() {
 
 // Bắt đầu ứng dụng
 initialize();
-
 // Loader function to inject and run the script
 function loadVideoProgressMenu(scriptUrl) {
     return new Promise((resolve, reject) => {
