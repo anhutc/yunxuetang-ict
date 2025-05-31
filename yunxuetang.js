@@ -354,6 +354,14 @@ const Features = {
                             }, 2000);
                         } else {
                             this._showFeatureMessage('🎉 All remaining videos completed!', 'success');
+                            GLOBALS.isRunning = !GLOBALS.isRunning;
+                            runButton.style.background = 'linear-gradient(90deg, #ffd600 0%, #ff9000 100%)';
+                
+                                // Show stop message using UI.showMessage
+                            UI.showMessage('⏸️ Program stopped! Auto-features disabled', 'warning');
+
+                            // Clean up all features when stopping
+                            Features.cleanup();
                         }
                     }
                 }
