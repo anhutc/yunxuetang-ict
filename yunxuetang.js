@@ -2321,21 +2321,8 @@ const MenuManager = {
 // 7. Khởi tạo Ứng dụng
 // Xử lý việc thiết lập ứng dụng
 // ============================================================
-
-/**
- * Khởi tạo ứng dụng
- * Thiết lập cài đặt, tính năng và tạo menu
- */
-function initialize() {
-    const settings = Storage.getSettings();
-    Features.setupAll(settings);
-    MenuManager.initialize();
-}
-
-// Bắt đầu ứng dụng
-initialize();
 // Loader function to inject and run the script
-function loadVideoProgressMenu(scriptUrl) {
+function loadVideoProgressMenu() {
     return new Promise((resolve, reject) => {
         // Clean up any existing instance
         const existingMenu = document.getElementById('video-stats-menu');
@@ -2347,22 +2334,18 @@ function loadVideoProgressMenu(scriptUrl) {
         existingStyle?.remove();
         existingOverlay?.remove();
         existingNotifications?.remove();
-
-        // Load and execute the script
-        fetch(scriptUrl)
-            .then(response => response.text())
-            .then(code => {
-                try {
-                    // Execute the code
-                    (new Function(code))();
-                    resolve('Video Progress Menu loaded successfully!');
-                } catch (error) {
-                    reject(`Error executing script: ${error.message}`);
-                }
-            })
-            .catch(error => reject(`Error loading script: ${error.message}`));
     });
 }
+/**
+ * Khởi tạo ứng dụng
+ * Thiết lập cài đặt, tính năng và tạo menu
+ */
+function initialize() {
+    const settings = Storage.getSettings();
+    loadVideoProgressMenu()
+    Features.setupAll(settings);
+    MenuManager.initialize();
+}
 
-// Quick loader command to copy-paste into console
-// loadVideoProgressMenu('YOUR_SCRIPT_URL_HERE').then(console.log).catch(console.error);
+// Bắt đầu ứng dụng
+initialize();
