@@ -285,16 +285,16 @@ const Features = {
                     nameElement.click();
                     this._showFeatureMessage('▶️ Starting next unfinished video...', 'info');
 
-                    // Wait 10 seconds before setting video time to 0
+                    // Wait 30 seconds before setting video time to 0
                     setTimeout(() => {
                         const video = document.getElementById("videocontainer-vjs");
-                        if (video) {
+                        if (video && video.readyState === 4) {
                             video.currentTime = 0;
                             this._showFeatureMessage('⏮️ Video time reset to beginning', 'info');
                         } else {
                             this._showFeatureMessage('⚠️ Could not reset video time', 'error');
                         }
-                    }, 10000); // 10 seconds
+                    }, 30000); // 30 seconds
                 } else {
                     this._showFeatureMessage('⚠️ Could not find video element', 'error');
                 }
@@ -393,8 +393,9 @@ const Features = {
         // Function to check and set video speed once
         const setSpeedToX2 = () => {
             try {
+                const video = document.getElementById("videocontainer-vjs");
                 const speedLabel = document.getElementsByClassName('jw-playrate-label')[0];
-                if (speedLabel && speedLabel.innerText !== 'x2') {
+                if (video.readyState === 4 && speedLabel && speedLabel.innerText !== 'x2') {
                     const speedOption = document.getElementsByClassName('jw-text jw-option jw-item-0')[4];
                     if (speedOption) {
                         speedOption.click();
@@ -410,12 +411,12 @@ const Features = {
             }
         };
 
-        // Execute once with a 5 second delay
+        // Execute once with a 30 second delay
         setTimeout(() => {
             if (GLOBALS.isRunning) {
                 setSpeedToX2();
             }
-        }, 5000);
+        }, 30000);
     },
 
     /**
