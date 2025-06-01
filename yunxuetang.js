@@ -2321,28 +2321,13 @@ const MenuManager = {
 // 7. Khởi tạo Ứng dụng
 // Xử lý việc thiết lập ứng dụng
 // ============================================================
-// Loader function to inject and run the script
-function loadVideoProgressMenu() {
-    return new Promise((resolve, reject) => {
-        // Clean up any existing instance
-        const existingMenu = document.getElementById('video-stats-menu');
-        const existingStyle = document.getElementById('video-progress-styles');
-        const existingOverlay = document.getElementById('video-stats-overlay');
-        const existingNotifications = document.getElementById('notifications-container');
-        
-        existingMenu?.remove();
-        existingStyle?.remove();
-        existingOverlay?.remove();
-        existingNotifications?.remove();
-    });
-}
+
 /**
  * Khởi tạo ứng dụng
  * Thiết lập cài đặt, tính năng và tạo menu
  */
 function initialize() {
     const settings = Storage.getSettings();
-    loadVideoProgressMenu()
     Features.setupAll(settings);
     MenuManager.initialize();
 }
