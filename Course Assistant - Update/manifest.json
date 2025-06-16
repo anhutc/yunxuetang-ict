@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "Course Assistant",
+  "version": "1.0",
+  "description": "A Chrome extension to assist with online courses",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.yunxuetang.cn/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.yunxuetang.cn/*"],
+      "js": ["src/content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [{
+    "resources": [
+      "src/modules/*.js"
+    ],
+    "matches": ["*://*.yunxuetang.cn/*"]
+  }]
+} 
